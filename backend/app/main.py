@@ -1,7 +1,9 @@
 from fastapi import FastAPI, BackgroundTasks, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 import uuid
+import os
 from sqlalchemy import select
 
 from app.config import Config
@@ -40,7 +42,20 @@ async def health():
 
 @app.get("/")
 async def root():
-    return {"message": "Edict API"}
+    dist_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "frontend", "dist", "index.html")
+    if os.path.exists(dist_path):
+        from fastapi.responses import FileResponse
+        return FileResponse(dist_path)
+    return {"message": "Edict API - Vue app not found"}
+
+
+@app.get("/assets/{path:path}")
+async def serve_assets(path: str):
+    from fastapi.responses import FileResponse
+    assets_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "frontend", "dist", "assets", path)
+    if os.path.exists(assets_path):
+        return FileResponse(assets_path)
+    return {"error": "Asset not found"}
 
 
 @app.post("/api/tasks", response_model=TaskResponse)

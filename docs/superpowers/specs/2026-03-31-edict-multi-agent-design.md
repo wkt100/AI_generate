@@ -313,12 +313,14 @@ def extract_json(text: str) -> str:
 ### 9.1 开发模式
 
 ```bash
-# 后端
-cd backend && uvicorn app.main:app --reload --port 8000
+# 构建前端
+cd frontend && npm run build
 
-# 前端
-cd frontend && npm run dev
+# 后端（直接服务 Vue 静态文件）
+cd backend && uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
+
+> 后端直接服务 Vue 构建产物，无需单独启动前端开发服务器。所有请求通过 `/api`、`/assets`、`/` 路由访问。
 
 ### 9.2 Docker 部署
 
@@ -331,12 +333,11 @@ services:
       - "8000:8000"
     volumes:
       - ./storage:/app/storage
-
-  frontend:
-    build: ./frontend
-    ports:
-      - "3000:80"
+    environment:
+      - MINIMAX_API_KEY=${MINIMAX_API_KEY}
 ```
+
+> 只需部署后端，前端静态文件由后端直接服务。
 
 ---
 
