@@ -63,7 +63,7 @@ async def _call_minimax(
     messages.append({"role": "user", "content": prompt})
 
     payload = {
-        "model": "abab6.5s-chat",
+        "model": "MiniMax-M2.7",
         "messages": messages,
     }
 
@@ -79,7 +79,19 @@ async def _call_minimax(
         response = await client.post(url, json=payload, headers=headers)
         response.raise_for_status()
         data = response.json()
-        return data["choices"][0]["message"]["content"]
+
+        # 处理不同响应格式
+        choices = data.get("choices")
+        if choices and len(choices) > 0:
+            return choices[0]["message"]["content"]
+
+        # 检查错误信息
+        base_resp = data.get("base_resp", {})
+        if base_resp.get("status_code") != 0:
+            error_msg = base_resp.get("status_msg", "Unknown error")
+            raise ValueError(f"Minimax API error: {error_msg}")
+
+        raise ValueError(f"Unexpected API response: {data}")
 
 
 async def call_llm_json(prompt: str, system_prompt: Optional[str] = None) -> dict:

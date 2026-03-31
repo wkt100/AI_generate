@@ -18,21 +18,21 @@ PROMPT_ZHONGSHU = """你是一个任务规划专家（中书省）。
 - 工部: 核心代码生成
 
 ## 输出格式 (JSON)
-{
+{{
   "nodes": [
-    {
+    {{
       "id": "step_1",
       "name": "步骤名称",
       "department": "部门名称",
       "description": "步骤描述"
-    }
+    }}
   ],
   "edges": [
-    {"from_node": "step_1", "to_node": "step_2"}
+    {{"from_node": "step_1", "to_node": "step_2"}}
   ],
   "estimated_steps": 3,
   "departments": ["工部", "刑部"]
-}
+}}
 
 ## 注意事项
 - 绝对不要生成循环依赖

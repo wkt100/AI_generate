@@ -17,11 +17,11 @@ PROMPT_MENXIA = """你是一个严格的质量审核专家（门下省）。
 - 不能遗漏关键步骤
 
 ## 输出格式 (JSON)
-{
+{{
   "approved": true/false,
   "reason": "审核说明",
   "suggestions": ["建议1", "建议2"]  // 如果不通过
-}
+}}
 
 任务: {task_description}
 DAG计划: {dag_json}

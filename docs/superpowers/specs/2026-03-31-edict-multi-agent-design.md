@@ -359,10 +359,47 @@ class Config:
 
 ---
 
-## 11. 验收标准
+## 11. 远程访问与防火墙配置
+
+### macOS 应用防火墙配置
+
+macOS 的应用防火墙基于进程白名单，监听 `0.0.0.0` 的服务仍可能被拦截。需要将进程加入白名单：
+
+```bash
+# 添加后端 (Python) 到防火墙白名单
+sudo /usr/libexec/ApplicationFirewall/socketfilterfw \
+  --add /opt/homebrew/Cellar/python@3.12/3.12.12/Frameworks/Python.framework/Versions/3.12/Resources/Python.app
+
+# 添加 venv Python 到防火墙白名单
+sudo /usr/libexec/ApplicationFirewall/socketfilterfw \
+  --add /Users/pro/projects/ai_edict/.venv/bin/python
+
+# 添加前端 (vite) 到防火墙白名单
+sudo /usr/libexec/ApplicationFirewall/socketfilterfw \
+  --add /Users/pro/projects/ai_edict/frontend/node_modules/.bin/vite
+
+# 重载防火墙规则
+sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate off && \
+sudo /usr/libexec/ApplicationFirewall/socketfilterfw --setglobalstate on
+```
+
+### 启动命令
+
+```bash
+# 后端
+cd backend && uvicorn app.main:app --host 0.0.0.0 --port 8000
+
+# 前端
+cd frontend && npm run dev -- --host 0.0.0.0
+```
+
+---
+
+## 12. 验收标准
 
 1. 用户输入任务后，系统自动执行完整 FSM 流程
 2. 前端实时显示任务状态（Kanban 和 Dashboard 视图可切换）
 3. 六部 Agent 各自正确执行职责，输出符合 Schema
 4. 任务完成后可在线预览代码和下载压缩包
 5. 支持 Docker 一键部署
+6. 支持局域网远程访问（需配置防火墙白名单）
