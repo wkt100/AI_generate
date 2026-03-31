@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.models import Task, TaskStep
 from app.db.database import async_session
 from app.schemas.task import PlanOutput, ReviewOutput, ExecuteOutput, ValidateOutput
+from app.api.ws import broadcast_task_update
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -63,6 +64,7 @@ class FSMEngine:
             task.status = "init"
             task.current_state = "INIT"
             logger.info(f"[{self.task_id}] [INIT] 任务初始化完成")
+            await broadcast_task_update(self.task_id, "init", "INIT", {"message": "任务初始化完成"})
 
     async def _mock_zhongshu(self, session: AsyncSession):
         """Mock 中书省: 生成 DAG"""
@@ -110,6 +112,7 @@ class FSMEngine:
             to_step.dependencies = json.dumps(deps)
 
         logger.info(f"[{self.task_id}] [PLAN] 中书省生成 DAG: 3 个步骤")
+        await broadcast_task_update(self.task_id, "plan", "PLAN", {"dag_nodes": 3})
 
     async def _mock_menxia(self, session: AsyncSession) -> ReviewOutput:
         """Mock 门下省: 审核计划"""
@@ -118,6 +121,7 @@ class FSMEngine:
         task.status = "review"
         task.current_state = "REVIEW"
         logger.info(f"[{self.task_id}] [REVIEW] 门下省审核通过")
+        await broadcast_task_update(self.task_id, "review", "REVIEW", {"approved": True})
         return ReviewOutput(task_id=self.task_id, approved=True, reason="计划合理")
 
     async def _mock_shangshu(self, session: AsyncSession):
@@ -146,6 +150,7 @@ class FSMEngine:
             step.output_data = json.dumps({"result": f"{step.department} 执行完成"})
             await session.commit()
             logger.info(f"[{self.task_id}] [EXECUTE] {step.department} 完成: {step.step_name}")
+            await broadcast_task_update(self.task_id, "execute", "EXECUTE", {"step": step.step_name, "department": step.department})
 
     async def _mock_xing(self, session: AsyncSession):
         """Mock 刑部: 验证结果"""
@@ -154,6 +159,7 @@ class FSMEngine:
         task.status = "validate"
         task.current_state = "VALIDATE"
         logger.info(f"[{self.task_id}] [VALIDATE] 刑部验证通过")
+        await broadcast_task_update(self.task_id, "validate", "VALIDATE", {"passed": True})
         return ValidateOutput(task_id=self.task_id, passed=True)
 
     async def _mark_done(self, session: AsyncSession):

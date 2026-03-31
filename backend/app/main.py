@@ -1,4 +1,4 @@
-from fastapi import FastAPI, BackgroundTasks
+from fastapi import FastAPI, BackgroundTasks, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import uuid
@@ -9,6 +9,7 @@ from app.db.database import init_db, async_session
 from app.db.models import Task
 from app.schemas.task import TaskCreate, TaskResponse
 from app.fsm.engine import create_and_run_task
+from app.api.ws import websocket_endpoint
 
 
 @asynccontextmanager
@@ -94,3 +95,8 @@ async def list_tasks():
             )
             for t in tasks
         ]
+
+
+@app.websocket("/ws/tasks/{task_id}")
+async def websocket_route(websocket: WebSocket, task_id: str):
+    await websocket_endpoint(websocket, task_id)
