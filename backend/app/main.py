@@ -10,6 +10,7 @@ from app.db.models import Task
 from app.schemas.task import TaskCreate, TaskResponse
 from app.fsm.engine import create_and_run_task
 from app.api.ws import websocket_endpoint
+from app.api.routes import router as api_router
 
 
 @asynccontextmanager
@@ -20,6 +21,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Edict API", version="0.1.0", lifespan=lifespan)
+
+app.include_router(api_router)
 
 app.add_middleware(
     CORSMiddleware,
