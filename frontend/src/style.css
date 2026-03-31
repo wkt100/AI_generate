@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+@theme {
+  --color-xuan-qing: #121212;
+  --color-xuan-qing-light: #1A1C23;
+  --color-amber-gold: #F59E0B;
+  --color-liu-li: #0D9488;
+  --color-zhu-sha: #EF4444;
+  --font-song: 'SimSun', 'STSong', serif;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-xuan-qing);
+    color: #cbd5e1;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    background-color: var(--color-amber-gold);
+    color: var(--color-xuan-qing);
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s;
+  }
+
+  .btn-primary:hover {
+    background-color: #d97706;
+  }
+
+  .card {
+    background-color: var(--color-xuan-qing-light);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    border: 1px solid #334155;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #1A1C23;
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 3px;
+}
